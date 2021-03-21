@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
   public UserDto createUser(UserDto userDto) {
     userUniqueCheck(userDto);
     User user = modelMapper.map(userDto, User.class);
-    user.setRole(roleService.findRoleByName(userDto.getRole()), isAdminUser());
+    user.setRole(roleService.findRoleByName(userDto.getRole()));
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     User registeredUser = userRepository.save(user);
     userDto.setId(registeredUser.getId());
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
     if (!userDto.getUsername().equals(userFromDb.getUsername())) {
       userUniqueCheck(userDto);
     }
-    userFromDb.setRole(roleService.findRoleByName(userDto.getRole()), isAdminUser());
+    userFromDb.setRole(roleService.findRoleByName(userDto.getRole()));
     userFromDb.setUsername(userDto.getUsername());
     userFromDb.setPassword(passwordEncoder.encode(userDto.getPassword()));
     userRepository.save(userFromDb);

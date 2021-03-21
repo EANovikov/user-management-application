@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -72,10 +73,18 @@ public class User implements UserDetails {
     return true;
   }
 
-  public void setRole(Role role, boolean isAdmin) {
-    if (!isAdmin && role.getName().equals("ROLE_ADMIN")) {
+  public void setRole(Role role) {
+    if (!isAdminUser() && role.getName().equals("ROLE_ADMIN")) {
       throw new IllegalRoleException("The role [" + role.getName() + "] can be set by admin only");
     }
     this.role = role;
+  }
+
+  private boolean isAdminUser() {
+    if (SecurityContextHolder.getContext().getAuthentication() != null) {
+      return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+              .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+    return false;
   }
 }
