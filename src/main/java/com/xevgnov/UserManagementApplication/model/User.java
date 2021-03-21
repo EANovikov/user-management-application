@@ -1,5 +1,6 @@
 package com.xevgnov.UserManagementApplication.model;
 
+import com.xevgnov.UserManagementApplication.exception.IllegalRoleException;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -49,8 +50,6 @@ public class User implements UserDetails {
         .forEach(
             p -> authorities.add(new SimpleGrantedAuthority(USER_AUTHORITY_PREFIX + p.name())));
     return authorities;
-    //    String auth = getRole().getName();
-    //    return List.of(new SimpleGrantedAuthority(getRole().getName()));
   }
 
   @Override
@@ -71,5 +70,12 @@ public class User implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
+  }
+
+  public void setRole(Role role, boolean isAdmin) {
+    if (!isAdmin && role.getName().equals("ROLE_ADMIN")) {
+      throw new IllegalRoleException("The role [" + role.getName() + "] can be set by admin only");
+    }
+    this.role = role;
   }
 }

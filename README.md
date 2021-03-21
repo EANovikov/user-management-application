@@ -1,7 +1,7 @@
 # user-management-application
 The application allows to authenticate with JWT tokens and manage users and their roles, including ability to list, create, modify and delete users
 
-#Requirements
+## Requirements
 Please create a Spring Boot (or Grails) REST application (back-end API only with MySQL
 db) and put i t on Github. API shall return JSON.
 The app shall have the following endpoints (it will be tested using Postman or similar):
@@ -40,12 +40,14 @@ b) Admin user creates a new user using the new role defined i n (a)
 c) New user l ogs i n and can only access ‘ Create User’ endpoint
 BONUS: create a docker-compose file to start back-end and db
 See page 2 for additional i nformation!
-Additional i nformation:
-host: localhost:8080
+
+### Additional i nformation:
+**host: localhost:8080
 default_user: admin
 default_password: admin
 endpoints:
-all UNAUTHORISED requests should return:
+all UNAUTHORISED requests should return:**
+
 - HTTP status 401
 - empty body
 all PERMISSION DENIED requests should return:

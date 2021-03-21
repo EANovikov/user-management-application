@@ -8,14 +8,17 @@ import com.xevgnov.UserManagementApplication.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
@@ -39,7 +42,7 @@ public class UserServiceImpl implements UserService {
   public UserDto createUser(UserDto userDto) {
     userUniqueCheck(userDto);
     User user = modelMapper.map(userDto, User.class);
-    user.setRole(roleService.findRoleByName(userDto.getRole()));
+    user.setRole(roleService.findRoleByName(userDto.getRole()), isAdminUser());
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     User registeredUser = userRepository.save(user);
     userDto.setId(registeredUser.getId());
@@ -96,7 +99,7 @@ public class UserServiceImpl implements UserService {
     if (!userDto.getUsername().equals(userFromDb.getUsername())) {
       userUniqueCheck(userDto);
     }
-    userFromDb.setRole(roleService.findRoleByName(userDto.getRole()));
+    userFromDb.setRole(roleService.findRoleByName(userDto.getRole()), isAdminUser());
     userFromDb.setUsername(userDto.getUsername());
     userFromDb.setPassword(passwordEncoder.encode(userDto.getPassword()));
     userRepository.save(userFromDb);
@@ -109,5 +112,13 @@ public class UserServiceImpl implements UserService {
       throw new UserAlreadyExistsException(
           "User with name " + user.getUsername() + " is already existing!");
     }
+  }
+
+  private boolean isAdminUser() {
+    if (SecurityContextHolder.getContext().getAuthentication() != null) {
+      return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+          .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+    return false;
   }
 }

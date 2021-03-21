@@ -10,20 +10,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Slf4j
 @Service
+@Transactional
 public class RoleServiceImpl implements RoleService {
 
   private final RolesRepository rolesRepository;
-  private final boolean adminUser;
 
   @Autowired
   public RoleServiceImpl(
-      RolesRepository rolesRepository, @Qualifier("adminUser") boolean adminUser) {
+      RolesRepository rolesRepository) {
     this.rolesRepository = rolesRepository;
-    this.adminUser = adminUser;
   }
 
   @Override
@@ -57,9 +57,6 @@ public class RoleServiceImpl implements RoleService {
     Role roleFromDb = rolesRepository.findByName(name);
     if (roleFromDb == null) {
       throw new IllegalRoleException("The role with [" + name + "] has not been found");
-    }
-    if (!adminUser && name.equals("ROLE_ADMIN")) {
-      throw new IllegalRoleException("The role [" + name + "] can be set by admin only");
     }
     log.info("Found role " + roleFromDb);
     return roleFromDb;
