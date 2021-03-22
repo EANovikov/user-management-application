@@ -2,7 +2,7 @@ drop table if exists roles;
 
 create table roles (
 id serial not null AUTO_INCREMENT primary key,
-name varchar(100) not null
+name varchar(100) unique not null
 )ENGINE=InnoDB;
 
 drop table if exists users;
